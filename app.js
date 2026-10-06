@@ -12,12 +12,13 @@
     String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   function photo(src, emoji, label) {
+    const srcs = [].concat(src);
     return `
-      <div class="photo" data-src="${esc(src)}">
+      <div class="photo${srcs.length > 1 ? " photo-diag" : ""}${srcs.length === 3 ? " photo-tri" : ""}${srcs.length === 4 ? " photo-quad" : ""}" data-src="${esc(srcs.join("|"))}">
         <div class="photo-fallback">
           <span class="photo-emoji">${emoji}</span>
           <span class="photo-label">${esc(label)}</span>
-          <span class="photo-hint">${esc(src)}</span>
+          <span class="photo-hint">${esc(srcs.join(" + "))}</span>
         </div>
       </div>`;
   }
@@ -121,7 +122,7 @@
         <div class="end-body">
           <p class="end-emoji">🍁</p>
           <h2>함께라서 더 따뜻한 교토</h2>
-          <p>어머님의 힐링, 연우의 덕질, 그리고 우리 셋의 추억</p>
+          <p>그리고 우리의 추억</p>
           <p class="end-meta">${esc(trip.period)}</p>
         </div>
       </section>`;
@@ -136,13 +137,18 @@
   deck.innerHTML = html.join("");
 
   document.querySelectorAll(".photo").forEach((el) => {
-    const img = new Image();
-    img.alt = "";
-    img.onload = () => {
-      el.classList.add("loaded");
-      el.prepend(img);
-    };
-    img.src = el.dataset.src;
+    const srcs = el.dataset.src.split("|");
+    let pending = srcs.length;
+    srcs.forEach((src, i) => {
+      const img = new Image();
+      img.alt = "";
+      img.className = `half-${i}`;
+      img.onload = () => {
+        el.prepend(img);
+        if (--pending === 0) el.classList.add("loaded");
+      };
+      img.src = src;
+    });
   });
 
   const slides = Array.from(deck.querySelectorAll(".slide"));

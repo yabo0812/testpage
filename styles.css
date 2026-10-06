@@ -60,6 +60,52 @@ html, body {
   height: 100%;
   object-fit: cover;
 }
+/* 사선 위치(%): 위쪽 끝, 아래쪽 끝, 두 사진 사이 틈. top > bottom 이어야 함 */
+.photo-diag { --top: 75; --bottom: 25; --gap: 1; }
+.photo-diag.loaded { background: var(--paper); }
+.photo-diag .half-0 {
+  width: calc(var(--top) * 1%);
+  object-position: right;
+  clip-path: polygon(0 0, 100% 0, calc(var(--bottom) / var(--top) * 100%) 100%, 0 100%);
+}
+.photo-diag .half-1 {
+  left: calc((var(--bottom) + var(--gap)) * 1%);
+  width: calc((100 - var(--bottom) - var(--gap)) * 1%);
+  clip-path: polygon(calc((var(--top) - var(--bottom)) / (100 - var(--bottom) - var(--gap)) * 100%) 0, 100% 0, 100% 100%, 0 100%);
+}
+/* 4분할: 사선 + 가운데 가로선. 순서는 왼쪽 위, 오른쪽 위, 왼쪽 아래, 오른쪽 아래
+   3분할: 왼쪽 전체(가장 큼), 오른쪽 위, 오른쪽 아래 */
+.photo-tri .half-0 { object-position: center; }
+.photo-quad, .photo-tri {
+  --yb: calc(50 - var(--gap) / 2);
+  --yt: calc(50 + var(--gap) / 2);
+  --xb: calc(var(--top) - (var(--top) - var(--bottom)) * var(--yb) / 100);
+  --xt: calc(var(--top) - (var(--top) - var(--bottom)) * var(--yt) / 100);
+}
+.photo-quad .half-0 {
+  height: calc(var(--yb) * 1%);
+  object-position: center;
+  clip-path: polygon(0 0, 100% 0, calc(var(--xb) / var(--top) * 100%) 100%, 0 100%);
+}
+.photo-quad .half-1, .photo-tri .half-1 {
+  left: calc((var(--xb) + var(--gap)) * 1%);
+  width: calc((100 - var(--xb) - var(--gap)) * 1%);
+  height: calc(var(--yb) * 1%);
+  clip-path: polygon(calc((var(--top) - var(--xb)) / (100 - var(--xb) - var(--gap)) * 100%) 0, 100% 0, 100% 100%, 0 100%);
+}
+.photo-quad .half-2 {
+  top: calc(var(--yt) * 1%);
+  width: calc(var(--xt) * 1%);
+  height: calc((100 - var(--yt)) * 1%);
+  clip-path: polygon(0 0, 100% 0, calc(var(--bottom) / var(--xt) * 100%) 100%, 0 100%);
+}
+.photo-quad .half-3, .photo-tri .half-2 {
+  top: calc(var(--yt) * 1%);
+  left: calc((var(--bottom) + var(--gap)) * 1%);
+  width: calc((100 - var(--bottom) - var(--gap)) * 1%);
+  height: calc((100 - var(--yt)) * 1%);
+  clip-path: polygon(calc((var(--xt) - var(--bottom)) / (100 - var(--bottom) - var(--gap)) * 100%) 0, 100% 0, 100% 100%, 0 100%);
+}
 .photo-fallback {
   position: absolute;
   inset: 0;
